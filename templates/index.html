@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block contents %}
+{% if request.session.user %}
+Hello, {{ request.session.user }}
+{% else %}
+Hello world!
+{% endif %}
+{{ email }}
+{% endblock %}
