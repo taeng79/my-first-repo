@@ -48,7 +48,7 @@ def logout_view(request):
 
 @login_required(login_url="/login")
 def user_list_view(request):
-    page = int(request.GET.get("p", 1))
+    page = int(request.GET.get("page", 1))
     users = User.objects.all().order_by("-id")
     paginator = Paginator(users, 3)
     users = paginator.get_page(page)

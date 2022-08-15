@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load humanize %}
 {% block contents %}
 
 <div class="row mt-5">
@@ -8,6 +7,7 @@
       <thead class="thead-light">
         <tr>
           <th scope="col">no.</th>
+          <th scope="col">유저명</th>
           <th scope="col">이메일</th>
           <th scope="col">가입날짜</th>
         </tr>
@@ -16,6 +16,7 @@
         {% for user in users %}
         <tr>
           <td scope="row">{{ user.id }}</td>
+          <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.register_date|date:'Y-m-d H:i' }}</td>
         </tr>
@@ -25,13 +26,11 @@
   </div>
 </div>
 
-
-<!--    FinalProject1(sbson) start-->
 <nav>
   <ul class="pagination justify-content-center">
-    {% if page_obj.has_previous %}
+    {% if users.has_previous %}
     <li class="page-item">
-      <a class="page-link" href="?page={{ page_obj.previous_page_number }}&s={{ request.GET.s }}">이전으로</a>
+      <a class="page-link" href="?page={{ users.previous_page_number }}">이전으로</a>
     </li>
     {% else %}
     <li class="page-item disabled">
@@ -39,11 +38,11 @@
     </li>
     {% endif %}
     <li class="page-item active">
-      <a class="page-link" href="#">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</a>
+      <a class="page-link" href="#">{{ users.number }} / {{ users.paginator.num_pages }}</a>
     </li>
-    {% if page_obj.has_next %}
+    {% if users.has_next %}
     <li class="page-item">
-      <a class="page-link" href="?page={{ page_obj.next_page_number }}&s={{ request.GET.s }}">다음으로</a>
+      <a class="page-link" href="?page={{ users.next_page_number }}">다음으로</a>
     {% else %}
     <li class="page-item disabled">
       <a class="page-link disabled" href="#">다음으로</a>
@@ -51,6 +50,5 @@
     </li>
   </ul>
 </nav>
-<!--    FinalProject1(sbson) end -->
 
 {% endblock %}
