@@ -1,7 +1,8 @@
-from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import make_password
-from django.shortcuts import redirect, render
-from django.views.generic.edit import FormView
+from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 
 from .forms import LoginForm, RegisterForm
 
@@ -9,36 +10,47 @@ User = get_user_model()
 
 
 def index(request):
-    return render(request, "index.html", {"email": request.session.get("user")})
+    return render(request, "index.html")
 
 
-class RegisterView(FormView):
-    template_name = "register.html"
-    form_class = RegisterForm
-    success_url = "/"
-
-    def form_valid(self, form):
-        user = User(
-            email=form.data.get("email"),
-            password=make_password(form.data.get("password")),
-        )
-        user.save()
-        return super().form_valid(form)
+def register_view(request):
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect("/login")
+    else:
+        logout(request)
+        form = RegisterForm()
+    return render(request, "register.html", {"form": form})
 
 
-class LoginView(FormView):
-    template_name = "login.html"
-    form_class = LoginForm
-    success_url = "/"
+def login_view(request):
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get("username")
+            user = User.objects.get(username=username)
+            login(request, user)
+            request.session["user"] = username
+            return HttpResponseRedirect("/")
+    else:
+        form = LoginForm()
+    return render(request, "login.html", {"form": form})
 
-    def form_valid(self, form):
-        self.request.session["user"] = form.data.get("email")
 
-        return super().form_valid(form)
-
-
-def logout(request):
+def logout_view(request):
     if "user" in request.session:
         del request.session["user"]
+    logout(request)
+    return HttpResponseRedirect("/login")
 
-    return redirect("/")
+
+@login_required(login_url="/login")
+def user_list_view(request):
+    page = int(request.GET.get("p", 1))
+    users = User.objects.all().order_by("-id")
+    paginator = Paginator(users, 3)
+    users = paginator.get_page(page)
+
+    return render(request, "users.html", {"users": users})
