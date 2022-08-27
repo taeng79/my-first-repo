@@ -23,9 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-036*t#yfhnc%#sqtt$n5162)jz=i32(6eb*-zwniv%+1x06lf="
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+ENV = os.environ.get("DJANGO_ENG", "dev")
+
+if ENV == "dev":
+    DEBUG = True
+else:
+    DEBUG = False
+
+ALLOWED_HOSTS = ["*"]
 
 AUTH_USER_MODEL = "user.User"
 
@@ -39,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "user",
+#    "django_seed",
 ]
 
 MIDDLEWARE = [
